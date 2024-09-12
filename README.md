@@ -1,2 +1,2 @@
-# horiz-pipes
-Grafysi's integration
+# horizpipes
+ Grafysi's data integration system
