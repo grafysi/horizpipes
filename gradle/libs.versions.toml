@@ -9,6 +9,7 @@ slf4j-api = "2.0.16"
 postgresql = "42.7.3"
 commons-lang3 = "3.16.0"
 apicurio-converter = "2.6.3.Final"
+kafka-native = "3.8.0"
 
 [libraries]
 debezium-api = {module = "io.debezium:debezium-api", version.ref = "debezium"}
@@ -16,6 +17,8 @@ debezium-embedded = {module = "io.debezium:debezium-embedded", version.ref = "de
 debezium-connector-postgres = {module = "io.debezium:debezium-connector-postgres", version.ref = "debezium"}
 
 apicurio-converter = {module = "io.apicurio:apicurio-registry-distro-connect-converter", version.ref = "apicurio-converter"}
+
+connect-transforms = {module = "org.apache.kafka:connect-transforms", version.ref = "kafka-native"}
 
 log4j-slf4j2-impl = {module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j-slf4j2-impl"}
 slf4j-api = {module = "org.slf4j:slf4j-api", version.ref = "slf4j-api"}

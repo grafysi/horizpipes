@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.jreleaser' version '1.14.0'
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+group = 'com.grafysi'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.grafysi'
+            artifactId = 'horizpipes-utils-connect-transforms'
+            version = '1.0-SNAPSHOT'
+
+            from components.java
+
+            pom {
+                name = 'horizpipes-utils-connect-transforms'
+                description = 'Horizpipes\'s utils: connect transforms'
+                url = 'https://github.com/grafysi/horizpipes'
+                inceptionYear = '2024'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'htringuyen'
+                        name = 'Huu-Tri Nguyen'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/grafysi/horizpipes.git'
+                    developerConnection = 'scm:git:ssh://github.com/grafysi/horizpipes.git'
+                    url = 'https://github.com/grafysi/horizpipes'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('target/staging-deploy')
+                }
+            }
+        }
+    }
+}
+
+
+
+dependencies {
+    implementation libs.connect.transforms
+    implementation libs.slf4j.api
+    implementation libs.log4j.slf4j2.impl
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
