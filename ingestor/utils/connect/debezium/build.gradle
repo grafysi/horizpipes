@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation libs.debezium.api
+    implementation libs.debezium.embedded
+
+    implementation libs.slf4j.api
+
+    testImplementation libs.log4j.slf4j2.impl
+
+    testImplementation libs.debezium.connector.postgres
+
+    testImplementation project(':ingestor:utils:connect:transforms')
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
