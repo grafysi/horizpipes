@@ -7,6 +7,4 @@ include ':ingestor:utils:connect:debezium-test'
 include ':ingestor:utils:connect:transforms'
 include 'ingestor:utils:connect:debezium'
 findProject(':ingestor:utils:connect:debezium')?.name = 'debezium'
-include 'ingestor:utils:connect:converter'
-findProject(':ingestor:utils:connect:converter')?.name = 'converter'
 

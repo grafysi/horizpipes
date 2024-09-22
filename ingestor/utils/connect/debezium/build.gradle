@@ -18,6 +18,8 @@ dependencies {
 
     implementation libs.debezium.connector.postgres
 
+    testImplementation project(':ingestor:utils:connect:transforms')
+
     testImplementation libs.log4j.slf4j2.impl
 
     testImplementation platform('org.junit:junit-bom:5.10.0')

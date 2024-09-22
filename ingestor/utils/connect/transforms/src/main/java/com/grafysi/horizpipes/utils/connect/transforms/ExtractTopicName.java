@@ -94,7 +94,7 @@ public class ExtractTopicName<R extends ConnectRecord<R>> implements Transformat
         var updatedHeaders = record.headers().duplicate();
         updatedHeaders.add(headerName, Values.parseString(headerValue));
 
-        LOGGER.info("ExtractTopic applied and will be returned. Record topic: {}", record.topic());
+        LOGGER.debug("ExtractTopic applied and will be returned. Record topic: {}", record.topic());
 
         return record.newRecord(
                 topic,

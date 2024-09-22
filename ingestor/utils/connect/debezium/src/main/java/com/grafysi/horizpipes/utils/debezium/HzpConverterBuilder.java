@@ -23,6 +23,8 @@ import io.debezium.embedded.ConverterBuilder;
 import io.debezium.embedded.EmbeddedEngineChangeEvent;
 import io.debezium.embedded.EmbeddedEngineHeader;
 
+import org.apache.kafka.common.header.internals.RecordHeaders;
+import org.apache.kafka.connect.header.Headers;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.storage.Converter;
 import org.apache.kafka.connect.storage.ConverterConfig;
@@ -58,6 +60,8 @@ public class HzpConverterBuilder<R> extends ConverterBuilder<R> {
     private static final String FIELD_CLASS = "class";
     private static final String TOPIC_NAME = "debezium";
     private static final String APICURIO_SCHEMA_REGISTRY_URL_CONFIG = "apicurio.registry.url";
+
+    private static final String CUSTOM_JSON_CONVERTER = "custom.json.converter"; // option for custom implementation
 
     private Class<? extends SerializationFormat<?>> formatHeader;
     private Class<? extends SerializationFormat<?>> formatKey;
@@ -119,8 +123,10 @@ public class HzpConverterBuilder<R> extends ConverterBuilder<R> {
                 if (topicName == null) {
                     topicName = TOPIC_NAME;
                 }
-                final byte[] key = keyConverter.fromConnectData(topicName, record.keySchema(), record.key());
-                final byte[] value = valueConverter.fromConnectData(topicName, record.valueSchema(), record.value());
+
+                var kafkaHeaders = convertKafkaHeaders(record, headerConverter);
+                final byte[] key = keyConverter.fromConnectData(topicName, kafkaHeaders, record.keySchema(), record.key());
+                final byte[] value = valueConverter.fromConnectData(topicName, kafkaHeaders, record.valueSchema(), record.value());
 
                 List<Header<?>> headers = Collections.emptyList();
                 if (headerConverter != null) {
@@ -180,6 +186,20 @@ public class HzpConverterBuilder<R> extends ConverterBuilder<R> {
         return headers;
     }
 
+    private RecordHeaders convertKafkaHeaders(SourceRecord record, HeaderConverter headerConverter) {
+        Headers headers = record.headers();
+        RecordHeaders result = new RecordHeaders();
+        if (headers != null) {
+            String topic = record.topic();
+            for (org.apache.kafka.connect.header.Header header : headers) {
+                String key = header.key();
+                byte[] rawHeader = headerConverter.fromConnectHeader(topic, key, header.schema(), header.value());
+                result.add(key, rawHeader);
+            }
+        }
+        return result;
+    }
+
     private HeaderConverter createHeaderConverter(Class<? extends SerializationFormat<?>> format) {
         Configuration converterConfig = config.subset(HEADER_CONVERTER_PREFIX, true);
         final Configuration commonConverterConfig = config.subset(CONVERTER_PREFIX, true);
@@ -212,9 +232,17 @@ public class HzpConverterBuilder<R> extends ConverterBuilder<R> {
         final Configuration commonConverterConfig = config.subset(CONVERTER_PREFIX, true);
         converterConfig = commonConverterConfig.edit().with(converterConfig).build();
 
+        if (!converterConfig.hasKey(CUSTOM_JSON_CONVERTER)) {
+            throw new RuntimeException();
+        }
+
         if (isFormat(format, Json.class) || isFormat(format, JsonByteArray.class)) {
             if (converterConfig.hasKey(APICURIO_SCHEMA_REGISTRY_URL_CONFIG)) {
                 converterConfig = converterConfig.edit().withDefault(FIELD_CLASS, "io.apicurio.registry.utils.converter.ExtJsonConverter").build();
+            }
+            else if (converterConfig.hasKey(CUSTOM_JSON_CONVERTER)) {
+                LOGGER.info("========== Use custom json converter");
+                //converterConfig = converterConfig.edit().withDefault(FIELD_CLASS, commonConverterConfig.getString(CUSTOM_JSON_CONVERTER)).build();
             }
             else {
                 converterConfig = converterConfig.edit().withDefault(FIELD_CLASS, "org.apache.kafka.connect.json.JsonConverter").build();

@@ -25,7 +25,7 @@ public abstract class JsonConfigAbstractTest {
         var cfg = new DbzConfigurer();
         cfg.set(Configs.CONNECTOR_NAME, "test-connector");
         cfg.set(Configs.CONNECTOR_CLASS, "io.debezium.connector.postgresql.PostgresConnector");
-        cfg.set(Configs.TOPIC_PREFIX, "dbz_test");
+        cfg.set(Configs.TOPIC_PREFIX, "test_dbz");
 
         cfg.set("plugin.name", "pgoutput");
         cfg.set("slot.name", "debezium_test");
@@ -48,10 +48,10 @@ public abstract class JsonConfigAbstractTest {
     }
 
     protected JsonConnector createConnector(
-            Consumer<ChangeEvent<String, String>> consumer, Properties overrideProps) {
+            Consumer<ChangeEvent<String, String>> consumer) {
         var props = defaultConnectorProperties();
 
-        props.putAll(overrideProps);
+        props.putAll(overrideProperties());
 
         LOGGER.info("Connector properties:");
         props.forEach((k, v) -> LOGGER.info("{}: {}", k, v));
@@ -60,16 +60,16 @@ public abstract class JsonConfigAbstractTest {
     }
 
 
-    protected void runConnector(Consumer<ChangeEvent<String, String>> consumer, Properties overrideProps) {
-        var connector = createConnector(consumer, overrideProps);
+    protected void runConnector(Consumer<ChangeEvent<String, String>> consumer) {
+        var connector = createConnector(consumer);
         executor.submit(connector);
         sleepForMs(DEFAULT_RUNNING_TIME_MS);
         connector.stop();
     }
 
 
-    protected void runConnector(Consumer<ChangeEvent<String, String>> consumer, Properties overrideProps, long runningTimeMs) {
-        var connector = createConnector(consumer, overrideProps);
+    protected void runConnector(Consumer<ChangeEvent<String, String>> consumer, long runningTimeMs) {
+        var connector = createConnector(consumer);
         executor.submit(connector);
         sleepForMs(runningTimeMs);
         connector.stop();
@@ -98,6 +98,10 @@ public abstract class JsonConfigAbstractTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    protected Properties overrideProperties() {
+        return new Properties();
     }
 }
 

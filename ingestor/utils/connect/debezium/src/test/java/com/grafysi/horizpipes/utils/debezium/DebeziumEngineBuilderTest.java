@@ -27,15 +27,20 @@ public class DebeziumEngineBuilderTest extends JsonConfigAbstractTest {
             recordCount.incrementAndGet();
         };
 
-        var overrideProps = new Properties();
 
-        overrideProps.put(Configs.TABLE_INCLUDE_LIST, "mimiciv_hosp.patients");
 
-        runConnector(consumer, overrideProps, 10_000);
+        runConnector(consumer, 10_000);
 
         final var expectedPatientCount = 100;
 
         assertEquals(expectedPatientCount, recordCount.get());
+    }
+
+    @Override
+    protected Properties overrideProperties() {
+        var props = new Properties();
+        props.put(Configs.TABLE_INCLUDE_LIST, "mimiciv_hosp.patients");
+        return props;
     }
 
 }
