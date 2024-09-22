@@ -19,7 +19,9 @@ public class HzpConvertingAsyncEngineBuilderFactory implements DebeziumEngine.Bu
     @Override
     public <T, V extends SerializationFormat<T>> DebeziumEngine.Builder<RecordChangeEvent<T>> builder(ChangeEventFormat<V> format) {
         var builder = (AsyncEmbeddedEngine.AsyncEngineBuilder<RecordChangeEvent<T>>) newAsyncEngineBuilder(ChangeEventFormat.class, format);
-        setConverterBuilder(builder, new HzpConverterBuilder<>());
+        var converterBuilder = new HzpConverterBuilder<>();
+        converterBuilder.using(KeyValueHeaderChangeEventFormat.of(null, format.getValueFormat(), null));
+        setConverterBuilder(builder, converterBuilder);
         return builder;
     }
 
@@ -27,14 +29,18 @@ public class HzpConvertingAsyncEngineBuilderFactory implements DebeziumEngine.Bu
     public <S, T, K extends SerializationFormat<S>, V extends SerializationFormat<T>> DebeziumEngine.Builder<ChangeEvent<S, T>> builder(
             KeyValueChangeEventFormat<K, V> format) {
         var builder = (AsyncEmbeddedEngine.AsyncEngineBuilder<ChangeEvent<S, T>>) newAsyncEngineBuilder(KeyValueChangeEventFormat.class, format);
-        setConverterBuilder(builder, new HzpConverterBuilder<>());
+        var converterBuilder = new HzpConverterBuilder<>();
+        converterBuilder.using(KeyValueHeaderChangeEventFormat.of(format.getKeyFormat(), format.getValueFormat(), null));
+        setConverterBuilder(builder, converterBuilder);
         return builder;
     }
 
     public <S, T, U, K extends SerializationFormat<S>, V extends SerializationFormat<T>, H extends SerializationFormat<U>> DebeziumEngine.Builder<ChangeEvent<S, T>> builder(
             KeyValueHeaderChangeEventFormat<K, V, H> format) {
         var builder = (AsyncEmbeddedEngine.AsyncEngineBuilder<ChangeEvent<S, T>>) newAsyncEngineBuilder(KeyValueHeaderChangeEventFormat.class, format);
-        setConverterBuilder(builder, new HzpConverterBuilder<>());
+        var converterBuilder = new HzpConverterBuilder<>();
+        converterBuilder.using(format);
+        setConverterBuilder(builder, converterBuilder);
         return builder;
     }
 
@@ -52,7 +58,7 @@ public class HzpConvertingAsyncEngineBuilderFactory implements DebeziumEngine.Bu
 
     private void setConverterBuilder(AsyncEmbeddedEngine.AsyncEngineBuilder<?> engineBuilder, ConverterBuilder<?> converterBuilder) {
         try {
-            var field = AsyncEmbeddedEngine.AsyncEngineBuilder.class.getField("converterBuilder");
+            var field = AsyncEmbeddedEngine.AsyncEngineBuilder.class.getDeclaredField("converterBuilder");
             field.setAccessible(true);
             field.set(engineBuilder, converterBuilder);
         } catch (Exception e) {

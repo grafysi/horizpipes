@@ -10,16 +10,6 @@ repositories {
 }
 
 dependencies {
-
-    implementation libs.debezium.api
-    implementation libs.debezium.embedded
-
-    implementation libs.slf4j.api
-
-    implementation libs.debezium.connector.postgres
-
-    testImplementation libs.log4j.slf4j2.impl
-
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }

@@ -9,9 +9,9 @@ import io.debezium.engine.format.KeyValueHeaderChangeEventFormat;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-public class AvroConnector implements Runnable{
+public class AvroConnector implements Runnable {
 
-    private final DebeziumEngine dbzEngine;
+    private final DebeziumEngine<?> dbzEngine;
 
     public AvroConnector(Properties props, Consumer<ChangeEvent<byte[], byte[]>> consumer) {
         this.dbzEngine = DebeziumEngine.create(
