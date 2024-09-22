@@ -1,11 +1,11 @@
 package io.horizpipes.dbztest;
 
+import com.grafysi.horizpipes.utils.connect.transforms.ExtractTopicName;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.debezium.engine.ChangeEvent;
 import io.horizpipes.dbztest.config.Configs;
 import io.horizpipes.dbztest.config.DbzConfigurer;
 import io.horizpipes.dbztest.util.CustomStrategy;
-import org.apache.kafka.connect.transforms.InsertHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +26,13 @@ public abstract class BasePgApicurioAvroTest {
         var cfg = new DbzConfigurer();
         cfg.set(Configs.CONNECTOR_NAME, "test-connector");
         cfg.set(Configs.CONNECTOR_CLASS, "io.debezium.connector.postgresql.PostgresConnector");
-        cfg.set(Configs.TOPIC_PREFIX, "test_v2-");
+        cfg.set(Configs.TOPIC_PREFIX, "test_dbz");
 
         cfg.set("plugin.name", "pgoutput");
         cfg.set("slot.name", "debezium_test_slot_01");
+
+        cfg.set("record.processing.threads", "1");
+        cfg.set("max.batch.size", "1");
 
         cfg.set(Configs.DATABASE_HOSTNAME, "localhost");
         cfg.set(Configs.DATABASE_PORT, "5433");
@@ -45,50 +48,27 @@ public abstract class BasePgApicurioAvroTest {
         cfg.set("key.converter.apicurio.registry.url", "http://apicurio.hzp.local:8000/apis/registry/v2");
         cfg.set("value.converter.apicurio.registry.url", "http://apicurio.hzp.local:8000/apis/registry/v2");
 
-        cfg.set("apicurio.registry.url", "http://apicurio.hzp.local:8000/apis/registry/v2");
-
-        //cfg.set("key.serializer", AvroKafkaSerializer.class.getName());
-        //cfg.set("value.serializer", AvroKafkaSerializer.class.getName());
-        //cfg.set("key.converter", AvroConverter.class.getName());
-        //cfg.set("value.converter", AvroConverter.class.getName());
-
-
         cfg.set("key.converter.apicurio.registry.auto-register", "true");
         cfg.set("value.converter.apicurio.registry.auto-register", "true");
 
         cfg.set("key.converter.apicurio.registry.find-latest", "true");
         cfg.set("value.converter.apicurio.registry.find-latest", "true");
 
-        /*cfg.set("key.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY,
-                CustomStrategy.class.getName());
-        cfg.set("value.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY,
-                CustomStrategy.class.getName());*/
+        cfg.set("key.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
+        cfg.set("value.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
 
-        //cfg.set(SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, "io.apicurio.registry.serde.strategy.TopicIdStrategy");
+        cfg.set("transforms", "ExtractTopic");
 
-        //cfg.set(SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, "io.apicurio.registry.serde.strategy.SimpleTopicIdStrategy");
-
-        //cfg.set(SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
-
-        //cfg.set(SchemaResolverConfig.ARTIFACT_RESOLVER_STRATEGY, RecordIdStrategy.class.getName());
-
-        //cfg.set("key.converter." + SerdeConfig.SCHEMA_RESOLVER, "a.non.existing.Class");
-
-        //cfg.set("schema.name.adjustment.mode", "avro");
-
-        cfg.set("transforms", "InsertHeader");
-
-        // config InsertHeader transform
-        cfg.set("transforms.InsertHeader.type", InsertHeader.class.getName());
-        cfg.set("transforms.InsertHeader.header", "__dbz_topic");
-        cfg.set("transforms.InsertHeader.value.literal", "${topic}");
+        // config ExtractTopic transform
+        cfg.set("transforms.ExtractTopic.type", ExtractTopicName.class.getName());
+        cfg.set("transforms.ExtractTopic.topic.regex", "test_dbz.mimiciv_hosp.(.*)");
+        cfg.set("transforms.ExtractTopic.header.name", "__from_table");
+        cfg.set("transforms.ExtractTopic.header.value.format", "__from_table__test_dbz.mimiciv_hosp.$1");
 
         // config Reroute transform
         /*cfg.set("transforms.Reroute.type", "io.debezium.transforms.ByLogicalTableRouter");
         cfg.set("transforms.Reroute.topic.regex", ".*");
-        cfg.set("transforms.Reroute.topic.replacement", "test.mimic4demo_hosp.all_tables_std2");*/
-
-
+        cfg.set("transforms.Reroute.topic.replacement", "test_dbz.mimic4demo.hosp.all");*/
 
         return cfg.buildProperties();
     }

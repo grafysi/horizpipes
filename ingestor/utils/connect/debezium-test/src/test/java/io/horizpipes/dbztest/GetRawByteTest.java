@@ -1,19 +1,21 @@
 package io.horizpipes.dbztest;
 
 
+import io.debezium.engine.Header;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GetRawByteTest extends BasePgApicurioAvroTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GetRawByteTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetRawByteTest.class);
 
     @BeforeEach
     public void setup() {
@@ -26,8 +28,8 @@ public class GetRawByteTest extends BasePgApicurioAvroTest {
     }
 
     @Test
-    void testGetRawByte() {
-        LOG.info("=============== Start testGetRawByte ===============");
+    void getRawBytesAndHeaders() {
+        LOGGER.info("=============== Test getRawBytesAndHeaders ===============");
 
         var recordCount = new AtomicInteger(0);
         var nullKeyCount = new AtomicInteger(0);
@@ -44,18 +46,23 @@ public class GetRawByteTest extends BasePgApicurioAvroTest {
                 nullValueCount.incrementAndGet();
             }
 
-            record.headers().forEach(header -> {
-                LOG.info("Header: {} = {}", header.getKey(), header.getValue());
-            });
+            logRecordHeaders(record.headers());
 
             recordCount.incrementAndGet();
         });
 
         assertTrue(recordCount.get() > 0);
 
-        LOG.info("Processed {} records", recordCount.get());
-        LOG.info("Null key count: {}", nullKeyCount.get());
-        LOG.info("Null value count: {}", nullValueCount.get());
+        LOGGER.info("Processed {} records", recordCount.get());
+        LOGGER.info("Null key count: {}", nullKeyCount.get());
+        LOGGER.info("Null value count: {}", nullValueCount.get());
+    }
+
+    private void logRecordHeaders(List<Header<Object>> headers) {
+        LOGGER.info("Record headers");
+        headers.forEach(header -> {
+            LOGGER.info("{}: {}", header.getKey(), header.getValue());
+        });
     }
 }
 

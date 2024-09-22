@@ -5,3 +5,6 @@ include ':ingestor:utils'
 include ':ingestor:utils:connect'
 include ':ingestor:utils:connect:debezium-test'
 include ':ingestor:utils:connect:transforms'
+include 'ingestor:utils:connect:debezium'
+findProject(':ingestor:utils:connect:debezium')?.name = 'debezium'
+

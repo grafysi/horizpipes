@@ -5,7 +5,6 @@ import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Avro;
 import io.debezium.engine.format.Json;
 import io.debezium.engine.format.KeyValueHeaderChangeEventFormat;
-import io.debezium.engine.format.SimpleString;
 
 import java.util.Properties;
 import java.util.function.Consumer;

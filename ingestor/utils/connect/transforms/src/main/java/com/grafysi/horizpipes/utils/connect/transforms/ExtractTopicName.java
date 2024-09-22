@@ -12,7 +12,6 @@ import org.apache.kafka.connect.transforms.util.SimpleConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -94,6 +93,9 @@ public class ExtractTopicName<R extends ConnectRecord<R>> implements Transformat
 
         var updatedHeaders = record.headers().duplicate();
         updatedHeaders.add(headerName, Values.parseString(headerValue));
+
+        LOGGER.info("ExtractTopic applied and will be returned. Record topic: {}", record.topic());
+
         return record.newRecord(
                 topic,
                 record.kafkaPartition(),
