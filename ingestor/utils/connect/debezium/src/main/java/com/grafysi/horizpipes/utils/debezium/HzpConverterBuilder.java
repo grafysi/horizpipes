@@ -232,10 +232,6 @@ public class HzpConverterBuilder<R> extends ConverterBuilder<R> {
         final Configuration commonConverterConfig = config.subset(CONVERTER_PREFIX, true);
         converterConfig = commonConverterConfig.edit().with(converterConfig).build();
 
-        if (!converterConfig.hasKey(CUSTOM_JSON_CONVERTER)) {
-            throw new RuntimeException();
-        }
-
         if (isFormat(format, Json.class) || isFormat(format, JsonByteArray.class)) {
             if (converterConfig.hasKey(APICURIO_SCHEMA_REGISTRY_URL_CONFIG)) {
                 converterConfig = converterConfig.edit().withDefault(FIELD_CLASS, "io.apicurio.registry.utils.converter.ExtJsonConverter").build();
