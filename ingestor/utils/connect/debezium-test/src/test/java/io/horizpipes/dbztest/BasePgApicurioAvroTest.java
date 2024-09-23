@@ -57,7 +57,7 @@ public abstract class BasePgApicurioAvroTest {
         cfg.set("key.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
         cfg.set("value.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
 
-        cfg.set("transforms", "ExtractTopic");
+        cfg.set("transforms", "ExtractTopic,Reroute");
 
         // config ExtractTopic transform
         cfg.set("transforms.ExtractTopic.type", ExtractTopicName.class.getName());
@@ -66,9 +66,9 @@ public abstract class BasePgApicurioAvroTest {
         cfg.set("transforms.ExtractTopic.header.value.format", "__from_table__test_dbz.mimiciv_hosp.$1");
 
         // config Reroute transform
-        /*cfg.set("transforms.Reroute.type", "io.debezium.transforms.ByLogicalTableRouter");
+        cfg.set("transforms.Reroute.type", "io.debezium.transforms.ByLogicalTableRouter");
         cfg.set("transforms.Reroute.topic.regex", ".*");
-        cfg.set("transforms.Reroute.topic.replacement", "test_dbz.mimic4demo.hosp.all");*/
+        cfg.set("transforms.Reroute.topic.replacement", "test_dbz.mimic4demo.hosp.all");
 
         return cfg.buildProperties();
     }

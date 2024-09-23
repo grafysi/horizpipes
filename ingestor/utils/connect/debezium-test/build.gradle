@@ -22,9 +22,12 @@ dependencies {
 
     implementation 'org.apache.kafka:connect-transforms:3.8.0'
 
+    implementation project(':ingestor:utils:connect:debezium')
+
+    testImplementation project(':ingestor:utils:connect:transforms')
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation project(':ingestor:utils:connect:transforms')
 }
 
 test {

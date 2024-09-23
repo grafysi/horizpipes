@@ -1,5 +1,6 @@
 package io.horizpipes.dbztest;
 
+import com.grafysi.horizpipes.utils.debezium.HzpConvertingAsyncEngineBuilderFactory;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Avro;
@@ -16,7 +17,7 @@ public class AvroConnector implements Runnable {
     public AvroConnector(Properties props, Consumer<ChangeEvent<byte[], byte[]>> consumer) {
         this.dbzEngine = DebeziumEngine.create(
                 KeyValueHeaderChangeEventFormat.of(Avro.class, Avro.class, Json.class),
-                        "io.debezium.embedded.async.ConvertingAsyncEngineBuilderFactory")
+                        HzpConvertingAsyncEngineBuilderFactory.class.getName())
                 .using(props)
                 .notifying(consumer)
                 .build();

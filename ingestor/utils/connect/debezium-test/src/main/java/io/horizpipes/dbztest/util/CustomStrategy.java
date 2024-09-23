@@ -35,7 +35,7 @@ public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, O
             return defaultTopicIdReference(metadata);
         }
 
-        return tableIdHeaderReference(tableIdHeader);
+        return tableIdHeaderReference(tableIdHeader, metadata.isKey());
     }
 
     /**
@@ -62,10 +62,10 @@ public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, O
                 .build();
     }
 
-    private ArtifactReference tableIdHeaderReference(String header) {
+    private ArtifactReference tableIdHeaderReference(String header, boolean isKey) {
         return ArtifactReference.builder()
                 .groupId(null)
-                .artifactId(header)
+                .artifactId(String.format("%s-%s", header, isKey ? "key" : "value"))
                 .build();
     }
 }

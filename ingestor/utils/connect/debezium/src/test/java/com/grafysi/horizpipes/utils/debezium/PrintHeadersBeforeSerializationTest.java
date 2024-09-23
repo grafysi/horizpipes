@@ -23,7 +23,7 @@ public class PrintHeadersBeforeSerializationTest extends JsonConfigAbstractTest 
     private static final Logger LOGGER = LoggerFactory.getLogger(PrintHeadersBeforeSerializationTest.class);
 
     @Test
-    void runConnectorAndPrintHeaderBeforeSerialization() {
+    void runConnectorAndPrintHeadersBeforeSerialization() {
         LOGGER.info("Test runConnectorAndPrintHeaderBeforeSerialization");
 
         var recordCount = new AtomicInteger(0);
