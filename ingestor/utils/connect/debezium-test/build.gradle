@@ -10,12 +10,20 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType(JavaCompile) {
+    options.deprecation = false // Disables deprecation warnings
+    options.warnings = false    // Disables general warnings
+    //options.failOnError = false
+}
+
 dependencies {
     implementation libs.debezium.api
     implementation libs.debezium.embedded
     implementation libs.debezium.connector.postgres
 
     implementation libs.apicurio.converter
+    implementation libs.apicurio.serdes.avro
+
 
     implementation libs.slf4j.api
     implementation libs.log4j.slf4j2.impl

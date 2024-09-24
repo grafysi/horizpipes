@@ -5,7 +5,9 @@ import io.apicurio.registry.serde.SerdeConfig;
 import io.debezium.engine.ChangeEvent;
 import io.horizpipes.dbztest.config.Configs;
 import io.horizpipes.dbztest.config.DbzConfigurer;
+import io.horizpipes.dbztest.util.CustomSchemaResolver;
 import io.horizpipes.dbztest.util.CustomStrategy;
+import org.apache.kafka.common.serialization.Serde;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public abstract class BasePgApicurioAvroTest {
 
         cfg.set(Configs.DATABASE_DBNAME, "mimic4demo");
         cfg.set(Configs.SCHEMA_INCLUDE_LIST, "mimiciv_hosp");
+        //cfg.set(Configs.TABLE_INCLUDE_LIST, "mimiciv_hosp.d_icd_procedures");
 
         cfg.set(Configs.KEY_CONVERTER, "io.apicurio.registry.utils.converter.AvroConverter");
         cfg.set(Configs.VALUE_CONVERTER, "io.apicurio.registry.utils.converter.AvroConverter");
@@ -54,6 +57,11 @@ public abstract class BasePgApicurioAvroTest {
         cfg.set("key.converter.apicurio.registry.find-latest", "true");
         cfg.set("value.converter.apicurio.registry.find-latest", "true");
 
+        // using custom schema resolver
+        cfg.set("key.converter." + SerdeConfig.SCHEMA_RESOLVER, CustomSchemaResolver.class.getName());
+        cfg.set("value.converter." + SerdeConfig.SCHEMA_RESOLVER, CustomSchemaResolver.class.getName());
+
+        // using custom artifact resolver strategy
         cfg.set("key.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
         cfg.set("value.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
 

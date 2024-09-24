@@ -46,10 +46,10 @@ public class GetRawByteTest extends BasePgApicurioAvroTest {
                 nullValueCount.incrementAndGet();
             }
 
-            logRecordHeaders(record.headers());
+            //logRecordHeaders(record.headers());
 
             recordCount.incrementAndGet();
-        });
+        }, 60_000);
 
         assertTrue(recordCount.get() > 0);
 

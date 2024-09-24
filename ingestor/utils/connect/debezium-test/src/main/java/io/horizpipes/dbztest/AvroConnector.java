@@ -1,6 +1,7 @@
 package io.horizpipes.dbztest;
 
 import com.grafysi.horizpipes.utils.debezium.HzpConvertingAsyncEngineBuilderFactory;
+import io.apicurio.registry.resolver.DefaultSchemaResolver;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Avro;
@@ -21,6 +22,7 @@ public class AvroConnector implements Runnable {
                 .using(props)
                 .notifying(consumer)
                 .build();
+
         /*this.dbzEngine = DebeziumEngine.create(Avro.class)
                 .using(props)
                 .notifying(consumer)

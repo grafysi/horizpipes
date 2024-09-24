@@ -8,7 +8,7 @@ commons-csv = "1.11.0"
 slf4j-api = "2.0.16"
 postgresql = "42.7.3"
 commons-lang3 = "3.16.0"
-apicurio-converter = "2.6.3.Final"
+apicurio-project = "2.6.3.Final"
 kafka-native = "3.8.0"
 
 [libraries]
@@ -16,7 +16,8 @@ debezium-api = {module = "io.debezium:debezium-api", version.ref = "debezium"}
 debezium-embedded = {module = "io.debezium:debezium-embedded", version.ref = "debezium"}
 debezium-connector-postgres = {module = "io.debezium:debezium-connector-postgres", version.ref = "debezium"}
 
-apicurio-converter = {module = "io.apicurio:apicurio-registry-distro-connect-converter", version.ref = "apicurio-converter"}
+apicurio-converter = {module = "io.apicurio:apicurio-registry-distro-connect-converter", version.ref = "apicurio-project"}
+apicurio-serdes-avro = {module = "io.apicurio:apicurio-registry-serdes-avro-serde", version.ref = "apicurio-project"}
 
 connect-transforms = {module = "org.apache.kafka:connect-transforms", version.ref = "kafka-native"}
 

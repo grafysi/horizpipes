@@ -167,7 +167,6 @@ public class ExtractTopicName<R extends ConnectRecord<R>> implements Transformat
         var headerValue = valueBuilder.toString();
 
         headerValueCache.put(topic, headerValue);
-
         return headerValue;
     }
 

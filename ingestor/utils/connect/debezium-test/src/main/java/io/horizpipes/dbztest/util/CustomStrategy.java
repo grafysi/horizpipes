@@ -11,6 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 
 public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, Object> {
 
@@ -18,17 +21,22 @@ public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, O
 
     private static final String TABLE_ID_HEADER = "__from_table";
 
+    private final Pattern PATTERN = Pattern.compile("\\{\"schema\":.*,\"payload\":\"(.*)\"}");
+
+    private final ConcurrentHashMap<ByteArray, String> cache = new ConcurrentHashMap<>();
+
+
     @Override
     public ArtifactReference artifactReference(Record<Object> data, ParsedSchema<T> parsedSchema) {
         var kafkaRecord = (KafkaSerdeRecord<Object>) data;
         var metadata = kafkaRecord.metadata();
-        var kafkaHeader = metadata.getHeaders();
+        var kafkaHeaders = metadata.getHeaders();
 
-        if (kafkaHeader == null) {
+        if (kafkaHeaders == null) {
             LOGGER.warn("Get table id failed for record of topic {}. Headers is null.", metadata.getTopic());
         }
 
-        var tableIdHeader = getFirstHeader(TABLE_ID_HEADER, metadata.getHeaders());
+        var tableIdHeader = getFirstHeader(TABLE_ID_HEADER, kafkaHeaders);
 
         if (tableIdHeader == null) {
             LOGGER.warn("Get table id failed. No header {} found.", TABLE_ID_HEADER);
@@ -43,16 +51,15 @@ public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, O
      */
     @Override
     public boolean loadSchema() {
-        return true;
+        return false;
     }
 
     private String getFirstHeader(String key, Headers headers) {
         var iter = headers.headers(key).iterator();
-        if (iter.hasNext()) {
-            var valueBytes = iter.next().value();
-            return new String(valueBytes, StandardCharsets.UTF_8);
-        }
-        return null;
+
+        return iter.hasNext() ?
+                extractTableIdFrom(iter.next().value(), this::parseHeaderValue)
+                : null;
     }
 
     private ArtifactReference defaultTopicIdReference(KafkaSerdeMetadata metadata) {
@@ -63,10 +70,33 @@ public class CustomStrategy<T> implements ArtifactReferenceResolverStrategy<T, O
     }
 
     private ArtifactReference tableIdHeaderReference(String header, boolean isKey) {
+        //LOGGER.info("Build artifact from header: {}-{}", header, isKey ? "key" : "value");
+        var schemaId = String.format("%s-%s", header, isKey ? "key" : "value");
         return ArtifactReference.builder()
                 .groupId(null)
-                .artifactId(String.format("%s-%s", header, isKey ? "key" : "value"))
+                .artifactId(schemaId)
                 .build();
+    }
+
+    private String extractTableIdFrom(byte[] headerValue, Function<String, String> extractor) {
+
+        var content = ByteArray.of(headerValue);
+
+        if (cache.contains(content)) {
+            return cache.get(content);
+        }
+
+        var tableId = extractor.apply(content.asString());
+        cache.put(content, tableId);
+        return tableId;
+    }
+
+    private String parseHeaderValue(String value) {
+        var matcher = PATTERN.matcher(value);
+        if (!matcher.matches()) {
+            return null;
+        }
+        return matcher.group(1);
     }
 }
 
