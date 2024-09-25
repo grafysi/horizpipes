@@ -8,6 +8,10 @@ version = 'unspecified'
 
 repositories {
     mavenCentral()
+    maven {
+        allowInsecureProtocol = true
+        url "http://nexus.hzp.local:8000/repository/maven-releases/"
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -30,9 +34,11 @@ dependencies {
 
     implementation 'org.apache.kafka:connect-transforms:3.8.0'
 
-    implementation project(':ingestor:utils:connect:debezium')
+    implementation project(':ingestor:utils:debezium')
 
-    testImplementation project(':ingestor:utils:connect:transforms')
+    //testImplementation project(':ingestor:utils:connect')
+
+    testImplementation 'com.grafysi.horizpipes:kafka-connect-utils:1.0.0'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

@@ -9,6 +9,9 @@ plugins {
 java {
     withJavadocJar()
     withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 ext.isReleaseVersion = false
@@ -18,16 +21,17 @@ version = '1.0.0'
 
 repositories {
     mavenCentral()
-    maven {
-        allowInsecureProtocol = true
-        url "http://nexus.hzp.local:8000/repository/maven-releases/"
-    }
 }
 
 dependencies {
-    implementation libs.connect.transforms
     implementation libs.slf4j.api
-    implementation libs.log4j.slf4j2.impl
+
+    compileOnly libs.connect.transforms
+    compileOnly libs.apicurio.converter
+
+    testImplementation libs.log4j.slf4j2.impl
+    testImplementation libs.connect.transforms
+    testImplementation libs.apicurio.converter
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -43,17 +47,15 @@ tasks.withType(GenerateModuleMetadata).configureEach {
     suppressedValidationErrors.add('enforced-platform')
 }
 
-println("USER_NAME:" + System.getenv('GITHUB_USER'))
-
-
 publishing {
     publications {
         hzpTransforms(MavenPublication) {
-            artifactId = 'connect-transforms'
+            artifactId = 'kafka-connect-utils'
             from components.java
             pom {
-                name = 'Custom Kafka connect transforms for Horizpipes'
-                description = 'Custom Kafka connect transforms for Horizpipes'
+                name = 'Kafka connect utils for use in ingestor'
+                description = 'Kafka connect utils for use in ingestor ' +
+                        'that groups events from all table into one topic'
                 url = 'https://github.com/grafysi/horizpipes'
                 licenses {
                     license {

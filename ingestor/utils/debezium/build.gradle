@@ -18,7 +18,7 @@ dependencies {
 
     implementation libs.debezium.connector.postgres
 
-    testImplementation project(':ingestor:utils:connect:transforms')
+    testImplementation project(':ingestor:utils:connect')
 
     testImplementation libs.log4j.slf4j2.impl
 

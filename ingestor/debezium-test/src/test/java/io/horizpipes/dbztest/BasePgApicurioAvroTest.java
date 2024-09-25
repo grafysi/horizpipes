@@ -1,13 +1,12 @@
 package io.horizpipes.dbztest;
 
+import com.grafysi.horizpipes.utils.connect.apicurio.CustomSchemaResolver;
+import com.grafysi.horizpipes.utils.connect.apicurio.CustomStrategy;
 import com.grafysi.horizpipes.utils.connect.transforms.ExtractTopicName;
 import io.apicurio.registry.serde.SerdeConfig;
 import io.debezium.engine.ChangeEvent;
 import io.horizpipes.dbztest.config.Configs;
 import io.horizpipes.dbztest.config.DbzConfigurer;
-import io.horizpipes.dbztest.util.CustomSchemaResolver;
-import io.horizpipes.dbztest.util.CustomStrategy;
-import org.apache.kafka.common.serialization.Serde;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +57,12 @@ public abstract class BasePgApicurioAvroTest {
         cfg.set("value.converter.apicurio.registry.find-latest", "true");
 
         // using custom schema resolver
-        cfg.set("key.converter." + SerdeConfig.SCHEMA_RESOLVER, CustomSchemaResolver.class.getName());
-        cfg.set("value.converter." + SerdeConfig.SCHEMA_RESOLVER, CustomSchemaResolver.class.getName());
+        cfg.set("key.converter.apicurio.registry.schema-resolver", CustomSchemaResolver.class.getName());
+        cfg.set("value.converter.apicurio.registry.schema-resolver", CustomSchemaResolver.class.getName());
 
         // using custom artifact resolver strategy
-        cfg.set("key.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
-        cfg.set("value.converter." + SerdeConfig.ARTIFACT_RESOLVER_STRATEGY, CustomStrategy.class.getName());
+        cfg.set("key.converter.apicurio.registry.artifact-resolver-strategy", CustomStrategy.class.getName());
+        cfg.set("value.converter.apicurio.registry.artifact-resolver-strategy", CustomStrategy.class.getName());
 
         cfg.set("transforms", "ExtractTopic,Reroute");
 

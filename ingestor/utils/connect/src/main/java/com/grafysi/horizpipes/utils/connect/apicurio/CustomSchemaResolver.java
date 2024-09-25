@@ -20,7 +20,7 @@
  * to using both contentId and user provided artifact id as key
  */
 
-package io.horizpipes.dbztest.util;
+package com.grafysi.horizpipes.utils.connect.apicurio;
 
 import io.apicurio.registry.resolver.*;
 import io.apicurio.registry.resolver.data.Record;

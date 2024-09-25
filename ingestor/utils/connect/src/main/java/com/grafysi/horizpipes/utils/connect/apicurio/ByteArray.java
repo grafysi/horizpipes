@@ -1,4 +1,4 @@
-package io.horizpipes.dbztest.util;
+package com.grafysi.horizpipes.utils.connect.apicurio;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
