@@ -3,7 +3,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-    id 'org.jreleaser' version '1.14.0'
+    //id 'org.jreleaser' version '1.14.0'
 }
 
 java {
@@ -13,265 +13,16 @@ java {
 
 ext.isReleaseVersion = false
 
-group = 'io.github.grafysi'
+group = 'com.grafysi.horizpipes'
 version = '1.0.0'
 
 repositories {
     mavenCentral()
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'io.github.grafysi'
-            artifactId = 'horizpipes-utils-connect-transforms'
-            version = '1.0.0'
-
-            from components.java
-
-            pom {
-                name = 'horizpipes-utils-connect-transforms'
-                description = 'Horizpipes\'s utils: connect transforms'
-                url = 'https://github.com/grafysi/horizpipes'
-                inceptionYear = '2024'
-                licenses {
-                    license {
-                        name = 'Apache-2.0'
-                        url = 'https://spdx.org/licenses/Apache-2.0.html'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'htringuyen'
-                        name = 'Huu-Tri Nguyen'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/grafysi/horizpipes.git'
-                    developerConnection = 'scm:git:ssh://github.com/grafysi/horizpipes.git'
-                    url = 'https://github.com/grafysi/horizpipes'
-                }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            url = layout.buildDirectory.dir('staging-deploy')
-        }
+    maven {
+        allowInsecureProtocol = true
+        url "http://nexus.hzp.local:8000/repository/maven-releases/"
     }
 }
-
-/*jreleaser {
-    gitRootSearch = true
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository('target/staging-deploy')
-                }
-            }
-        }
-    }
-}*/
-
-/*jreleaser {
-    gitRootSearch = true
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    deploy {
-        maven {
-            mavenCentral {
-                sonatype {
-                    active = 'ALWAYS'
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-                    stagingRepository('target/staging-deploy')
-
-                    artifactOverride {
-                        // Match artifact by groupId
-                        // If undefined, will use `#{project.java.groupId}`.
-                        //
-                        groupId = 'com.grafysi'
-
-                        // Match artifact by artifactId
-                        //
-                        artifactId = 'horizpipes-utils-connect-transforms'
-
-                        // Verifies that a matching `-sources.jar` artifact is staged.
-                        // Defaults to `false`.
-                        //
-                        sourceJar = true
-
-                        // Verifies that a matching `-javadoc.jar` artifact is staged.
-                        // Defaults to `false`.
-                        //
-                        javadocJar = true
-
-                        // Verifies that POM files comply with the minimum requirements for publication
-                        // to Maven Central. Checks rules using PomChecker.
-                        //
-                        verifyPom = false
-                    }
-
-                    namespace = 'io.github.grafysi'
-                }
-            }
-        }
-    }
-}*/
-
-jreleaser {
-    gitRootSearch = true
-    signing {
-        active = 'ALWAYS'
-        armored = true
-    }
-    deploy {
-        maven {
-            //
-            pomchecker {
-                // Defines the tool version to use.
-                //
-                version = '1.12.0'
-
-                // Fail the release if pomchecker outputs a warning.
-                // Defaults to `true`.
-                //
-                failOnWarning = false
-
-                // Fail the release if pomchecker outputs an error.
-                // Defaults to `true`.
-                //
-                failOnError = false
-            }
-
-            //
-            mavenCentral {
-                // Deployers require a name.
-                //
-                connectTransforms {
-
-                    // Enables or disables the deployer.
-                    // Supported values are [`NEVER`, `ALWAYS`, `RELEASE`, `SNAPSHOT`].
-                    // Defaults to `NEVER`.
-                    //
-                    active = 'ALWAYS'
-
-                    // URL where the MavenCentral service is enabled.
-                    //
-                    url = 'https://central.sonatype.com/api/v1/publisher'
-
-                    // List of directories where staged artifacts can be found.
-                    //
-                    stagingRepository('build/staging-deploy')
-
-                    // Activates publication of snapshot artifacts.
-                    // Defaults to `false`.
-                    //
-                    snapshotSupported = true
-
-                    // Signs artifacts with the configured credentials.
-                    // The Signing section must be configured as well.
-                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
-                    //
-                    sign = true
-
-                    // Checksums all artifacts with `MD5`, `SHA-1`, `SHA-256`, and `SHA-512`.
-                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
-                    //
-                    checksums = false
-
-                    // Verifies that a matching `-sources.jar` artifact is staged.
-                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
-                    //
-                    sourceJar = false
-
-                    // Verifies that a matching `-javadoc.jar` artifact is staged.
-                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
-                    //
-                    javadocJar = false
-
-                    // Verifies that POM files comply with the minimum requirements for publication
-                    // to Maven Central. Checks rules using PomChecker.
-                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
-                    //
-                    verifyPom = false
-
-                    // Verifies pom files, signs all artifacts, verifies that matching `-sources.jar` and
-                    // `-javadoc.jar` artifacts are also staged.
-                    // Defaults to `false`.
-                    //
-                    applyMavenCentralRules = false
-
-                    // Override artifact configuration
-                    //
-                    artifactOverride {
-                        // Match artifact by groupId
-                        // If undefined, will use `#{project.java.groupId}`.
-                        //
-                        groupId = 'io.github.grafysi'
-
-                        // Match artifact by artifactId
-                        //
-                        artifactId = 'horizpipes-utils-connect-transforms'
-
-                        //version = '1.0-SNAPSHOT'
-
-                        // Verifies that a matching `-sources.jar` artifact is staged.
-                        // Defaults to `false`.
-                        //
-                        sourceJar = false
-
-                        // Verifies that a matching `-javadoc.jar` artifact is staged.
-                        // Defaults to `false`.
-                        //
-                        javadocJar = false
-
-                        // Verifies that POM files comply with the minimum requirements for publication
-                        // to Maven Central. Checks rules using PomChecker.
-                        //
-                        verifyPom = false
-                    }
-
-                    // Defines the connection timeout in seconds.
-                    // Defaults to `20`.
-                    //
-                    connectTimeout = 20
-
-                    // Defines the read timeout in seconds.
-                    // Defaults to `60`.
-                    //
-                    readTimeout = 60
-
-                    // Registered publication namespace.
-                    // Defaults to `${project.java.groupId}`.
-                    //
-                    namespace = 'io.github.grafysi'
-
-                    // Time to wait between state transition checks, in seconds.
-                    // Defaults to `10`.
-                    //
-                    retryDelay = 2
-
-                    // Maximum number of attempts to verify state transition.
-                    // Defaults to `60`.
-                    //
-                    maxRetries = 60
-                }
-            }
-        }
-    }
-}
-
-
 
 dependencies {
     implementation libs.connect.transforms
@@ -285,3 +36,250 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+tasks.withType(GenerateModuleMetadata).configureEach {
+    // The value 'enforced-platform' is provided in the validation
+    // error message you got
+    suppressedValidationErrors.add('enforced-platform')
+}
+
+println("USER_NAME:" + System.getenv('GITHUB_USER'))
+
+
+publishing {
+    publications {
+        hzpTransforms(MavenPublication) {
+            artifactId = 'connect-transforms'
+            from components.java
+            pom {
+                name = 'Custom Kafka connect transforms for Horizpipes'
+                description = 'Custom Kafka connect transforms for Horizpipes'
+                url = 'https://github.com/grafysi/horizpipes'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'htringuyen'
+                        name = 'Huu-Tri Nguyen'
+                        email = 'tringuyenh75@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'LocalNexus'
+            def releasesRepoUrl = 'http://nexus.hzp.local:8000/repository/maven-releases/'
+            def snapshotsRepoUrl = 'http://nexus.hzp.local:8000/repository/maven-snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            allowInsecureProtocol = true
+            credentials {
+                username = project.findProperty("local.nexus.username")
+                password = project.findProperty("local.nexus.password")
+            }
+        }
+        maven {
+            name = "GithubPackages"
+            url = "https://maven.pkg.github.com/grafysi/horizpipes"
+
+            credentials {
+                username = System.getenv("GITHUB_USER")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+
+
+// configuration for publishing to sonatype maven central using publish API
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'io.github.grafysi'
+//            artifactId = 'horizpipes-utils-connect-transforms'
+//            version = '1.0.0'
+//
+//            from components.java
+//
+//            pom {
+//                name = 'horizpipes-utils-connect-transforms'
+//                description = 'Horizpipes\'s utils: connect transforms'
+//                url = 'https://github.com/grafysi/horizpipes'
+//                inceptionYear = '2024'
+//                licenses {
+//                    license {
+//                        name = 'Apache-2.0'
+//                        url = 'https://spdx.org/licenses/Apache-2.0.html'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id = 'htringuyen'
+//                        name = 'Huu-Tri Nguyen'
+//                    }
+//                }
+//                scm {
+//                    connection = 'scm:git:https://github.com/grafysi/horizpipes.git'
+//                    developerConnection = 'scm:git:ssh://github.com/grafysi/horizpipes.git'
+//                    url = 'https://github.com/grafysi/horizpipes'
+//                }
+//            }
+//        }
+//    }
+//
+//    repositories {
+//        maven {
+//            url = layout.buildDirectory.dir('staging-deploy')
+//        }
+//    }
+//}
+//
+//jreleaser {
+//    gitRootSearch = true
+//    signing {
+//        active = 'ALWAYS'
+//        armored = true
+//    }
+//    deploy {
+//        maven {
+//            //
+//            pomchecker {
+//                // Defines the tool version to use.
+//                //
+//                version = '1.12.0'
+//
+//                // Fail the release if pomchecker outputs a warning.
+//                // Defaults to `true`.
+//                //
+//                failOnWarning = false
+//
+//                // Fail the release if pomchecker outputs an error.
+//                // Defaults to `true`.
+//                //
+//                failOnError = false
+//            }
+//
+//            //
+//            mavenCentral {
+//                // Deployers require a name.
+//                //
+//                connectTransforms {
+//
+//                    // Enables or disables the deployer.
+//                    // Supported values are [`NEVER`, `ALWAYS`, `RELEASE`, `SNAPSHOT`].
+//                    // Defaults to `NEVER`.
+//                    //
+//                    active = 'ALWAYS'
+//
+//                    // URL where the MavenCentral service is enabled.
+//                    //
+//                    url = 'https://central.sonatype.com/api/v1/publisher'
+//
+//                    // List of directories where staged artifacts can be found.
+//                    //
+//                    stagingRepository('build/staging-deploy')
+//
+//                    // Activates publication of snapshot artifacts.
+//                    // Defaults to `false`.
+//                    //
+//                    snapshotSupported = true
+//
+//                    // Signs artifacts with the configured credentials.
+//                    // The Signing section must be configured as well.
+//                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
+//                    //
+//                    sign = true
+//
+//                    // Checksums all artifacts with `MD5`, `SHA-1`, `SHA-256`, and `SHA-512`.
+//                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
+//                    //
+//                    checksums = false
+//
+//                    // Verifies that a matching `-sources.jar` artifact is staged.
+//                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
+//                    //
+//                    sourceJar = false
+//
+//                    // Verifies that a matching `-javadoc.jar` artifact is staged.
+//                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
+//                    //
+//                    javadocJar = false
+//
+//                    // Verifies that POM files comply with the minimum requirements for publication
+//                    // to Maven Central. Checks rules using PomChecker.
+//                    // Defaults to `false` unless `applyMavenCentralRules` is set to `true`.
+//                    //
+//                    verifyPom = false
+//
+//                    // Verifies pom files, signs all artifacts, verifies that matching `-sources.jar` and
+//                    // `-javadoc.jar` artifacts are also staged.
+//                    // Defaults to `false`.
+//                    //
+//                    applyMavenCentralRules = false
+//
+//                    // Override artifact configuration
+//                    //
+//                    artifactOverride {
+//                        // Match artifact by groupId
+//                        // If undefined, will use `#{project.java.groupId}`.
+//                        //
+//                        groupId = 'io.github.grafysi'
+//
+//                        // Match artifact by artifactId
+//                        //
+//                        artifactId = 'horizpipes-utils-connect-transforms'
+//
+//                        //version = '1.0-SNAPSHOT'
+//
+//                        // Verifies that a matching `-sources.jar` artifact is staged.
+//                        // Defaults to `false`.
+//                        //
+//                        sourceJar = false
+//
+//                        // Verifies that a matching `-javadoc.jar` artifact is staged.
+//                        // Defaults to `false`.
+//                        //
+//                        javadocJar = false
+//
+//                        // Verifies that POM files comply with the minimum requirements for publication
+//                        // to Maven Central. Checks rules using PomChecker.
+//                        //
+//                        verifyPom = false
+//                    }
+//
+//                    // Defines the connection timeout in seconds.
+//                    // Defaults to `20`.
+//                    //
+//                    connectTimeout = 20
+//
+//                    // Defines the read timeout in seconds.
+//                    // Defaults to `60`.
+//                    //
+//                    readTimeout = 60
+//
+//                    // Registered publication namespace.
+//                    // Defaults to `${project.java.groupId}`.
+//                    //
+//                    namespace = 'io.github.grafysi'
+//
+//                    // Time to wait between state transition checks, in seconds.
+//                    // Defaults to `10`.
+//                    //
+//                    retryDelay = 2
+//
+//                    // Maximum number of attempts to verify state transition.
+//                    // Defaults to `60`.
+//                    //
+//                    maxRetries = 60
+//                }
+//            }
+//        }
+//    }
+//}
